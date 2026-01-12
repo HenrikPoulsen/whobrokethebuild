@@ -1,0 +1,7 @@
+﻿[2025.12.30-16.21.48:618][  6]LogThreadingWindows: Error: Runnable thread RHIThread crashed.
+[2025.12.30-16.21.48:618][  6]LogWindows: Error: === Critical error: ===
+[2025.12.30-16.21.48:618][  6]LogWindows: Error:
+[2025.12.30-16.21.48:618][  6]LogWindows: Error: Fatal error!
+[2025.12.30-16.21.48:618][  6]LogWindows: Error:
+[2025.12.30-16.21.48:618][  6]LogWindows: Error: Unhandled Exception: EXCEPTION_ACCESS_VIOLATION reading address 0xffffffffffffffff
+[2025.12.30-16.21.48:618][  6]LogWindows: Error:

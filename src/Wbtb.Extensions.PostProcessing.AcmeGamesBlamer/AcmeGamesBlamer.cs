@@ -127,6 +127,7 @@ namespace Wbtb.Extensions.PostProcessing.AcmeGamesBlamer
             bool isBluePrintError = false;
             bool isCPPError = false;
             bool isFunctionalTestError = false;
+            bool unrealFallbackError = false;
             bool isJenkinsInternalError = false;
             bool isJenkinsBuildTimeout = false;
             List<string> blamedUserNames = new List<string>();
@@ -165,6 +166,9 @@ namespace Wbtb.Extensions.PostProcessing.AcmeGamesBlamer
 
                     if (line.Items.Any(l => l.Type == "flag" && l.Content == "blueprint"))
                         isBluePrintError = true;
+                    
+                    if (line.Items.Any(l => l.Type == "flag" && l.Content == "unreal-error"))
+                        unrealFallbackError = true;
 
                     if (parsedTextResponse.Value.Type == "Wbtb.Extensions.LogParsing.JenkinsSelfFailing" && line.Items.Any(l => l.Type == "internalError"))
                     {
@@ -308,6 +312,10 @@ namespace Wbtb.Extensions.PostProcessing.AcmeGamesBlamer
 
             if (isCPPError)
                 breakExtraFlag = "C++ error";
+            
+            // We only set it as a generic unreal error if it hasn't already been set to something else
+            if (breakExtraFlag == "" && unrealFallbackError)
+                breakExtraFlag = "Unreal error";
 
             if (string.IsNullOrEmpty(specificErrorParsed))
                 description += $"Could not find definitive cause, 'error' keyword match returned:\n{basicErrorParsed}\n";

@@ -427,6 +427,8 @@
     <EmbeddedResource Include="Wbtb.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="JSON\all\builds\Project_Ironbird\logs\49.txt" />
+    <EmbeddedResource Include="JSON\all\builds\Project_Ironbird\logs\50.txt" />
   </ItemGroup>
 
   <ItemGroup>

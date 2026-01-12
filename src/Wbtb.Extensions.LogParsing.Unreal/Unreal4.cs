@@ -55,6 +55,9 @@ namespace Wbtb.Extensions.LogParsing.Unreal
             string bluePrintRegex5 = @"LogBlueprint: Error: \[AssetLog\] .*?: \[Compiler]\ (.*)? from Source: (.*)?";
             string shaderRegex = @"LogShaderCompilers: Warning:\n*(.*?.usf)\(\): Shader (.*?), .*";
 
+            //UProcessUnitTest::CheckOutputForError
+            string basicErrorRegex = @"(?<logger>Log[A-Za-z]+): (?<severity>Error|Fatal): (?<description>.*)";
+
             // force Unix paths on log, this helps reduce noise when getting distinct lines
             string fullErrorLog = raw.Replace("\\", "/");
 
@@ -67,10 +70,11 @@ namespace Wbtb.Extensions.LogParsing.Unreal
             // try for cache
             Cache cache = di.Resolve<Cache>();
             CachePayload shaderMatchLookup = cache.Get(this, job, build, this.ContextPluginConfig.Key);
-            if (shaderMatchLookup != null)
+            if (shaderMatchLookup.Payload != null)
                 return shaderMatchLookup.Payload;
 
             StringBuilder allMatches = new StringBuilder();
+            bool matchFound = false;
 
             foreach (string chunk in chunks) 
             {
@@ -94,6 +98,7 @@ namespace Wbtb.Extensions.LogParsing.Unreal
                     }
 
                     allMatches.Append(builder.GetText());
+                    matchFound = true;
                 }
 
                 matches = new Regex(bluePrintRegex5, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled).Matches(chunk);
@@ -112,6 +117,7 @@ namespace Wbtb.Extensions.LogParsing.Unreal
                     }
 
                     allMatches.Append(builder.GetText());
+                    matchFound = true;
                 }
 
                 // shaders
@@ -131,6 +137,31 @@ namespace Wbtb.Extensions.LogParsing.Unreal
                     }
 
                     allMatches.Append(builder.GetText());
+                    matchFound = true;
+                }
+
+                if (!matchFound)
+                {
+                    // We fallback to basic error/fatal parsing
+                    matches = new Regex(basicErrorRegex, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled).Matches(chunk);
+                    if (matches.Any())
+                    {
+                        BuildLogTextBuilder builder = new BuildLogTextBuilder(this.ContextPluginConfig.Manifest.Key);
+
+                        // always add flag at start of log data
+                        builder.AddItem("unreal-error", "flag");
+
+                        foreach (Match match in matches)
+                        {
+                            builder.AddItem(match.Groups["severity"].Value, "severity");
+                            builder.AddItem(match.Groups["logger"].Value, "logger");
+                            builder.AddItem(match.Groups["description"].Value, "description");
+                            builder.NewLine();
+                        }
+
+                        allMatches.Append(builder.GetText());
+                        matchFound = true;
+                    }
                 }
             }
 

@@ -1,0 +1,6 @@
+﻿LogWindows: Error: begin: stack for UAT
+LogWindows: Error: === Critical error: ===
+LogWindows: Error:
+LogWindows: Error: Can't save D:/Somepath.umap: export (/Some/Path/Maps/SomeMap.00_Something) has a reference to export (/Some/Path/Maps/SomeMap.00_Something) which still has its external package set to (/Some/Path/Maps/SomeMap.00_Something/ABCDFE123456).
+LogWindows: Error:
+LogWindows: Error: [Callstack] 0x00007ff8fe07782a KERNELBASE.dll!UnknownFunction []
